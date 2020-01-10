@@ -23,10 +23,12 @@ public class Board {
     }
 
     public void move(Soldier soldier, int newX, int newY){
-        if(checkCoordinates(soldier.getCoordinates(), newX, newY) && soldier.getHitPoints() > 0) {
-            soldier.moves(newY, newX);
-            for(Soldier soldierFromList : soldierList) {
-                if(!soldierFromList.equals(soldier) &&
+        if(soldier.getHitPoints() > 0) {
+            if (checkCoordinates(soldier.getCoordinates(), newX, newY)) {
+                soldier.moves(newY, newX);
+            }
+            for (Soldier soldierFromList : soldierList) {
+                if (!soldierFromList.equals(soldier) &&
                         soldier.isEnemyOnSight(soldierFromList.getCoordinates()) &&
                         soldierFromList.getHitPoints() > 0) {
                     soldier.hits(soldierFromList, 20);
@@ -45,6 +47,7 @@ public class Board {
 
     private boolean checkCoordinates(int[] coordinates, int newX, int newY){
         return (((coordinates[0] + newX < BOARD_BOUNDARY) && (coordinates[1] + newY < BOARD_BOUNDARY)) &&
-                ((coordinates[0] + newX >= 0) && (coordinates[1] + newY >= 0)));
+                ((coordinates[0] + newX >= 0) && (coordinates[1] + newY >= 0)) &&
+                (boardArray[coordinates[0]+newX][coordinates[1]+newY] == null));
     }
 }
