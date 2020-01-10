@@ -8,12 +8,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import roles.Soldier;
 
+import java.util.List;
 
 public class GameLoop extends AnimationTimer {
 
     private GraphicsContext gc;
     private Board board;
     private boolean turn;
+
+    private Font letterFont = Font.font("Times New Roman", FontWeight.BOLD, 10);
 
     GameLoop(GraphicsContext gc){
         this.gc = gc;
@@ -33,6 +36,7 @@ public class GameLoop extends AnimationTimer {
             board.move(soldierB, -1, -1);
         }
         turn = !turn;
+        printPoints(board.getSoldierList());
         printBoard(board.getBoardArray());
         try {
             Thread.sleep(500);
@@ -40,9 +44,18 @@ public class GameLoop extends AnimationTimer {
         catch (InterruptedException e){}
     }
 
+    private void printPoints(List<Soldier> soldierList){
+        int height = 25;
+        for(Soldier soldier : soldierList){
+            gc.setFont(letterFont);
+            gc.setFill(Color.BLACK);
+            gc.fillText("Soldier " + soldier.getStatus().toString() + ": " + soldier.getHitPoints(), 150, height);
+            height+=10;
+        }
+    }
+
     private void printBoard(String[][] board){
         Font pointFont = Font.font("Times New Roman", FontWeight.BOLD, 48);
-        Font letterFont = Font.font("Times New Roman", FontWeight.BOLD, 10);
         for(int y=0; y<10; y++){
             for(int x=0; x<10; x++){
                 if(board[x][y] != null) {
