@@ -3,18 +3,20 @@ package board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import roles.Soldier;
+import roles.Status;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TestBoard {
+class TestBoard {
 
     private Board board;
 
     @BeforeEach void init(){
         board = new Board();
     }
+
     @Test void soldiersListSize(){
         assertThat(board.getSoldierList().size(), is(2));
     }
@@ -27,8 +29,8 @@ public class TestBoard {
     }
 
     @Test void soldiersAreSplitEquallyBetweenTeams(){
-        assertThat(board.getSoldierList().get(0).getTeam(), is("A"));
-        assertThat(board.getSoldierList().get(1).getTeam(), is("B"));
+        assertThat(board.getSoldierList().get(0).getStatus(), is(Status.A));
+        assertThat(board.getSoldierList().get(1).getStatus(), is(Status.B));
     }
 
     @Test void soldierPositionWithinBoard(){
@@ -40,24 +42,66 @@ public class TestBoard {
                 is("B"));
     }
 
-    @Test void moveSoldiers(){
-        for(int i=0; i<10; i++) {
-            printBoard(board.getBoardArray());
-            board.move(board.getSoldierList().get(i%2==0 ? 0 : 1), 0, 1);
-        }
+    @Test void soldiers_find_each_other(){
+        Soldier soldierA = board.getSoldierList().get(0);
+        Soldier soldierB = board.getSoldierList().get(1);
+        assertThat(soldierA.getHitPoints(), is(100));
+        assertThat(soldierB.getHitPoints(), is(100));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(100));
+        assertThat(soldierB.getHitPoints(), is(100));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(100));
+        assertThat(soldierB.getHitPoints(), is(100));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(100));
+        assertThat(soldierB.getHitPoints(), is(100));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(80));
+        assertThat(soldierB.getHitPoints(), is(80));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(60));
+        assertThat(soldierB.getHitPoints(), is(60));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(60));
+        assertThat(soldierB.getHitPoints(), is(40));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(60));
+        assertThat(soldierB.getHitPoints(), is(40));
+
+        board.move(soldierA, 1, 1);
+        board.move(soldierB, -1, -1);
+        assertThat(soldierA.getHitPoints(), is(60));
+        assertThat(soldierB.getHitPoints(), is(40));
     }
 
-    private void printBoard(String[][] board){
-        for(int x=0; x<10; x++){
-            for(int y=0; y<10; y++){
-                if(board[x][y] != null)
-                    System.out.print(board[x][y]);
-                else
-                    System.out.print(".");
-                System.out.print("  ");
-            }
-            System.out.print("\n");
+    @Test void a_dead_soldier_cannot_move_and_hit_or_be_hit(){
+        Soldier soldierA = board.getSoldierList().get(0);
+        Soldier soldierB = board.getSoldierList().get(1);
+        soldierA.hits(soldierB, 100);
+        assertThat(soldierA.getHitPoints(), is(100));
+        assertThat(soldierB.getHitPoints(), is(0));
+        for(int i=1; i<9; i++) {
+            board.move(soldierA, 1, 1);
+            board.move(soldierB, -1, -1);
+            assertThat(soldierA.getHitPoints(), is(100));
+            assertThat(soldierB.getHitPoints(), is(0));
+            assertThat(soldierA.getCoordinates(), is(new int[]{i,i}));
+            assertThat(soldierB.getCoordinates(), is(new int[]{9,9}));
         }
-        System.out.print("\n");
     }
 }

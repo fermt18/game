@@ -8,7 +8,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import roles.Soldier;
 
-import java.util.Random;
 
 public class GameLoop extends AnimationTimer {
 
@@ -16,7 +15,7 @@ public class GameLoop extends AnimationTimer {
     private Board board;
     private boolean turn;
 
-    public GameLoop(GraphicsContext gc){
+    GameLoop(GraphicsContext gc){
         this.gc = gc;
         this.board = new Board();
         turn = true;
@@ -25,12 +24,14 @@ public class GameLoop extends AnimationTimer {
     @Override
     public void handle(long now) {
         gc.clearRect(0,0,400,200);
-        //String[][] board = new String[10][10];
-        //Random random = new Random();
-        //board[random.nextInt(10)][random.nextInt(10)] = "A";
         Soldier soldierA = board.getSoldierList().get(0);
         Soldier soldierB = board.getSoldierList().get(1);
-        board.move(turn ? soldierA : soldierB, 0, 1);
+        if(turn){
+            board.move(soldierA, 1, 1);
+        }
+        else {
+            board.move(soldierB, -1, -1);
+        }
         turn = !turn;
         printBoard(board.getBoardArray());
         try {

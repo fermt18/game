@@ -1,6 +1,7 @@
 package board;
 
 import roles.Soldier;
+import roles.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,24 +17,29 @@ public class Board {
 
     public Board(){
         soldierList = new ArrayList<>();
-        soldierList.add(new Soldier("A", 100, new int[]{0, 0}));
-        soldierList.add(new Soldier("B", 100, new int[]{9, 9}));
+        soldierList.add(new Soldier(Status.A, 100, new int[]{0, 0}));
+        soldierList.add(new Soldier(Status.B, 100, new int[]{9, 9}));
         updateBoard();
     }
 
     public void move(Soldier soldier, int newX, int newY){
-        if(checkCoordinates(soldier.getCoordinates(), newX, newY))
-            soldierList.stream()
-                .filter(s -> s.getTeam().equals(soldier.getTeam()))
-                .findFirst()
-                .ifPresent(s -> s.moves(newY, newX));
+        if(checkCoordinates(soldier.getCoordinates(), newX, newY) && soldier.getHitPoints() > 0) {
+            soldier.moves(newY, newX);
+            for(Soldier soldierFromList : soldierList) {
+                if(!soldierFromList.equals(soldier) &&
+                        soldier.isEnemyOnSight(soldierFromList.getCoordinates()) &&
+                        soldierFromList.getHitPoints() > 0) {
+                    soldier.hits(soldierFromList, 20);
+                }
+            }
+        }
         updateBoard();
     }
 
     private void updateBoard(){
         boardArray = new String[BOARD_BOUNDARY][BOARD_BOUNDARY];
         for(Soldier soldier : soldierList){
-            boardArray[soldier.getCoordinates()[0]][soldier.getCoordinates()[1]] = soldier.getTeam();
+            boardArray[soldier.getCoordinates()[0]][soldier.getCoordinates()[1]] = soldier.getStatus().toString();
         }
     }
 
